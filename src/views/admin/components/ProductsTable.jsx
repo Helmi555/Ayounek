@@ -18,6 +18,9 @@ const ProductsTable = ({ filteredProducts }) => (
           <h5>Price</h5>
         </div>
         <div className="grid-col">
+          <h5>Category</h5>
+        </div>
+        <div className="grid-col">
           <h5>Date Added</h5>
         </div>
         <div className="grid-col">

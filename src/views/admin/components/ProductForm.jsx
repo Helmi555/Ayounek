@@ -18,6 +18,11 @@ const brandOptions = [
   { value: 'Sexbomb', label: 'Sexbomb' },
   { value: 'Black Kibal', label: 'Black Kibal' }
 ];
+const categoryOptions = [
+  { value: 1, label: 'Rounded',description:"Circular or oval frames" },
+  { value: 2, label: 'Square',description:"Frames with equal width and height, featuring sharp angles." },
+  { value: 3, label: 'Rectangle',description:"Wider than they are tall, with straight lines and angles." }
+];
 
 const FormSchema = Yup.object().shape({
   name: Yup.string()
@@ -48,13 +53,17 @@ const FormSchema = Yup.object().shape({
     .min(1, 'Please add a default color for this product.'),
   imageUrl: Yup.string()
     .url('Must be a valid URL')
-    .required('Thumbnail Image URL is required')
+    .required('Thumbnail Image URL is required'),
+    category:Yup.number()
+    .required('Category is required')
+    .oneOf([1,2,3],'Inavlid category')
 });
 
 const ProductForm = ({ product, onSubmit, isLoading }) => {
   const initFormikValues = {
     name: product?.name || '',
     brand: product?.brand || '',
+    category:product?.category || 1,
     price: product?.price || 0,
     maxQuantity: product?.maxQuantity || 0,
     description: product?.description || '',
@@ -75,6 +84,7 @@ const ProductForm = ({ product, onSubmit, isLoading }) => {
       return;
     }
 
+    console.info("form is : ",form, " and category is : ",form.category)
     onSubmit({
       ...form,
       quantity: 1,
@@ -117,6 +127,21 @@ const ProductForm = ({ product, onSubmit, isLoading }) => {
                     disabled={isLoading}
                     placeholder="Select/Create Brand"
                     label="* Brand"
+                  />
+                </div>
+                &nbsp;
+                <div className="product-form-field">
+                  <CustomCreatableSelect
+                    defaultValue={{
+                      label: categoryOptions.find(option => option.value === values.category)?.label || '',
+                      value: values.category
+                    }}
+                    name="category"
+                    iid="category"
+                    options={categoryOptions}
+                    disabled={isLoading}
+                    placeholder="Select Category"
+                    label="* Category"
                   />
                 </div>
               </div>

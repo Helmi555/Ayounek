@@ -14,6 +14,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Select from 'react-select';
 
+
+const categoryOptions = [
+  { value: 1, label: 'Rounded',description:"Circular or oval frames" },
+  { value: 2, label: 'Square',description:"Frames with equal width and height, featuring sharp angles." },
+  { value: 3, label: 'Rectangle',description:"Wider than they are tall, with straight lines and angles." }
+];
+
+
 const ViewProduct = () => {
   const { id } = useParams();
   const { product, isLoading, error } = useProduct(id);
@@ -101,7 +109,10 @@ const ViewProduct = () => {
             <div className="product-modal-details">
               <br />
               <span className="text-subtle">{product.brand}</span>
+              <div className='d-flex-between-center'>
               <h1 className="margin-top-0">{product.name}</h1>
+              <h3 className='margin-top-0 '>{categoryOptions.find(opt=>opt.value===product.category)?.label }</h3>
+              </div>
               <span>{product.description}</span>
               <br />
               <br />

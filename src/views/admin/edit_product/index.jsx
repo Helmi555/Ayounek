@@ -8,6 +8,8 @@ import { editProduct } from '@/redux/actions/productActions';
 
 const ProductForm = lazy(() => import('../components/ProductForm'));
 
+
+
 const EditProduct = ({ match }) => {
   useDocumentTitle('Edit Product | Salinaka');
   useScrollTop();

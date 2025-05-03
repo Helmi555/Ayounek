@@ -8,6 +8,14 @@ import { useDispatch } from 'react-redux';
 import { useHistory, withRouter } from 'react-router-dom';
 import { removeProduct } from '@/redux/actions/productActions';
 
+
+const categoryOptions = [
+  { value: 1, label: 'Rounded',description:"Circular or oval frames" },
+  { value: 2, label: 'Square',description:"Frames with equal width and height, featuring sharp angles." },
+  { value: 3, label: 'Rectangle',description:"Wider than they are tall, with straight lines and angles." }
+];
+
+
 const ProductItem = ({ product }) => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -58,6 +66,9 @@ const ProductItem = ({ product }) => {
           </div>
           <div className="grid-col">
             <span>{product.price ? displayMoney(product.price) : <Skeleton width={30} />}</span>
+          </div>
+          <div className="grid-col">
+            <span>{categoryOptions.find(opt=>opt.value===product.category)?.label || <Skeleton width={30} />}</span>
           </div>
           <div className="grid-col">
             <span>
@@ -115,6 +126,7 @@ ProductItem.propTypes = {
     id: PropType.string,
     name: PropType.string,
     brand: PropType.string,
+    category:PropType.number,
     price: PropType.number,
     maxQuantity: PropType.number,
     description: PropType.string,
