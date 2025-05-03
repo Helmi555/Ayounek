@@ -7,12 +7,39 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { setPaymentDetails } from '@/redux/actions/checkoutActions';
+import { clearBasket } from '@/redux/actions/basketActions';
+import Swal from 'sweetalert2'
+import { resetCheckout } from '@/redux/actions/checkoutActions';
 
-const Total = ({ isInternational, subtotal }) => {
+const Total = ({ isInternational, subtotal, type }) => {
+  console.warn("Total : ", isInternational, subtotal)
   const { values, submitForm } = useFormikContext();
   const history = useHistory();
   const dispatch = useDispatch();
-
+  const onConfirm = () => {
+    console.info("HIIIIIIIIIII : ", values, type);
+    if (type !== "paypal") {
+      // Check if any value is empty string
+      const hasEmpty = Object.values(values).some((v) => v === '');
+      if (hasEmpty) {
+        submitForm();
+        return;
+      }
+    }
+    Swal.fire({
+      title: 'Payment Successful!',
+      text: 'Your purchase has been successfully completed. Thank you for trusting Ayounek!',
+      icon: 'success',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
+      willClose: () => {
+        dispatch(resetCheckout())
+        dispatch(clearBasket())
+        history.push('/');
+      }
+    });
+  };
   const onClickBack = () => {
     // destructure to only select left fields omitting cardnumber and ccv
     const { cardnumber, ccv, ...rest } = values;
@@ -43,7 +70,7 @@ const Total = ({ isInternational, subtotal }) => {
         <button
           className="button"
           disabled={false}
-          onClick={submitForm}
+          onClick={onConfirm}
           type="button"
         >
           <CheckOutlined />

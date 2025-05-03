@@ -8,18 +8,28 @@ import { applyFilter, resetFilter } from '@/redux/actions/filterActions';
 import { selectMax, selectMin } from '@/selectors/selector';
 import PriceRange from './PriceRange';
 
+const categoryOptions = [
+  { value: 0, label: 'All Categories', description: 'All available categories' },
+  { value: 1, label: 'Rounded', description: 'Circular or oval frames' },
+  { value: 2, label: 'Square', description: 'Frames with equal width and height, featuring sharp angles.' },
+  { value: 3, label: 'Rectangle', description: 'Wider than they are tall, with straight lines and angles.' }
+];
+
 const Filters = ({ closeModal }) => {
   const { filter, isLoading, products } = useSelector((state) => ({
     filter: state.filter,
     isLoading: state.app.loading,
     products: state.products.items
   }));
+
   const [field, setFilter] = useState({
-    brand: filter.brand,
-    minPrice: filter.minPrice,
-    maxPrice: filter.maxPrice,
-    sortBy: filter.sortBy
+    brand: filter.brand || '',
+    minPrice: filter.minPrice || 0,
+    maxPrice: filter.maxPrice || 0,
+    sortBy: filter.sortBy || '',
+    category: Number(filter.category) || 0 // Ensure it's a number
   });
+
   const dispatch = useDispatch();
   const history = useHistory();
   const didMount = useDidMount();
@@ -38,15 +48,19 @@ const Filters = ({ closeModal }) => {
     window.scrollTo(0, 0);
   }, [filter]);
 
-
   const onPriceChange = (minVal, maxVal) => {
     setFilter({ ...field, minPrice: minVal, maxPrice: maxVal });
   };
 
   const onBrandFilterChange = (e) => {
     const val = e.target.value;
-
     setFilter({ ...field, brand: val });
+  };
+
+  const onCategoryFilterChange = (e) => {
+    const val = parseInt(e.target.value, 10); // Convert to number
+    console.info("Selected Category:", val);
+    setFilter({ ...field, category: val });
   };
 
   const onSortFilterChange = (e) => {
@@ -54,11 +68,12 @@ const Filters = ({ closeModal }) => {
   };
 
   const onApplyFilter = () => {
-    const isChanged = Object.keys(field).some((key) => field[key] !== filter[key]);
-
     if (field.minPrice > field.maxPrice) {
+      alert('Minimum price cannot be greater than maximum price.');
       return;
     }
+
+    const isChanged = Object.keys(field).some((key) => field[key] !== filter[key]);
 
     if (isChanged) {
       dispatch(applyFilter(field));
@@ -68,17 +83,23 @@ const Filters = ({ closeModal }) => {
   };
 
   const onResetFilter = () => {
-    const filterFields = ['brand', 'minPrice', 'maxPrice', 'sortBy'];
+    const initialFilter = {
+      brand: '',
+      minPrice: 0,
+      maxPrice: 0,
+      sortBy: '',
+      category: 0
+    };
 
-    if (filterFields.some((key) => !!filter[key])) {
-      dispatch(resetFilter());
-    } else {
-      closeModal();
-    }
+    setFilter(initialFilter);
+    dispatch(resetFilter());
+
+    if (closeModal) closeModal();
   };
 
   return (
     <div className="filters">
+      {/* BRAND FILTER */}
       <div className="filters-field">
         <span>Brand</span>
         <br />
@@ -100,6 +121,27 @@ const Filters = ({ closeModal }) => {
           </select>
         )}
       </div>
+
+      {/* CATEGORY FILTER */}
+      <div className="filters-field">
+        <span>Category</span>
+        <br />
+        <br />
+        <select
+          className="filters-brand"
+          value={field.category}
+          disabled={isLoading || products.length === 0}
+          onChange={onCategoryFilterChange}
+        >
+          {categoryOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* SORT BY FILTER */}
       <div className="filters-field">
         <span>Sort By</span>
         <br />
@@ -117,6 +159,8 @@ const Filters = ({ closeModal }) => {
           <option value="price-asc">Price Low - High</option>
         </select>
       </div>
+
+      {/* PRICE RANGE FILTER */}
       <div className="filters-field">
         <span>Price Range</span>
         <br />
@@ -137,6 +181,8 @@ const Filters = ({ closeModal }) => {
           />
         )}
       </div>
+
+      {/* ACTION BUTTONS */}
       <div className="filters-action">
         <button
           className="filters-button button button-small"

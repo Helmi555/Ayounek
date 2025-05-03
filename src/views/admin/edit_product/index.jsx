@@ -11,7 +11,7 @@ const ProductForm = lazy(() => import('../components/ProductForm'));
 
 
 const EditProduct = ({ match }) => {
-  useDocumentTitle('Edit Product | Salinaka');
+  useDocumentTitle('Edit Product | Ayounek');
   useScrollTop();
   const { product, error, isLoading } = useProduct(match.params.id);
   const dispatch = useDispatch();

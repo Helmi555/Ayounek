@@ -5,9 +5,19 @@ import React from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { applyFilter } from '@/redux/actions/filterActions';
 
+
+
+const categoryOptions = [
+  { value: 0, label: 'All Categories',description:"All available categories" },
+  { value: 1, label: 'Rounded',description:"Circular or oval frames" },
+  { value: 2, label: 'Square',description:"Frames with equal width and height, featuring sharp angles." },
+  { value: 3, label: 'Rectangle',description:"Wider than they are tall, with straight lines and angles." }
+];
+
+
 const ProductAppliedFilters = ({ filteredProductsCount }) => {
   const filter = useSelector((state) => state.filter, shallowEqual);
-  const fields = ['brand', 'minPrice', 'maxPrice', 'sortBy', 'keyword'];
+  const fields = ['brand', 'minPrice', 'maxPrice', 'sortBy', 'keyword','category'];
   const isFiltered = fields.some((key) => !!filter[key]);
   const dispatch = useDispatch();
 
@@ -21,6 +31,9 @@ const ProductAppliedFilters = ({ filteredProductsCount }) => {
 
   const onRemoveBrandFilter = () => {
     dispatch(applyFilter({ brand: '' }));
+  };
+  const onRemoveCategoryFilter = () => {
+    dispatch(applyFilter({ category: 0 }));
   };
 
   const onRemoveSortFilter = () => {
@@ -57,6 +70,19 @@ const ProductAppliedFilters = ({ filteredProductsCount }) => {
             <div className="pill padding-right-l">
               <h5 className="pill-content margin-0">{filter.brand}</h5>
               <div className="pill-remove" onClick={onRemoveBrandFilter} role="presentation">
+                <h5 className="margin-0 text-subtle">
+                  <CloseCircleOutlined />
+                </h5>
+              </div>
+            </div>
+          </div>
+        )}
+        {filter.category!==0 &&  (
+          <div className="pill-wrapper">
+            <span className="d-block">Category</span>
+            <div className="pill padding-right-l">
+              <h5 className="pill-content margin-0">{categoryOptions.find(opt=>opt.value===filter.category).label}</h5>
+              <div className="pill-remove" onClick={onRemoveCategoryFilter} role="presentation">
                 <h5 className="margin-0 text-subtle">
                   <CloseCircleOutlined />
                 </h5>

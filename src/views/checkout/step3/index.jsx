@@ -11,6 +11,8 @@ import withCheckout from '../hoc/withCheckout';
 import CreditPayment from './CreditPayment';
 import PayPalPayment from './PayPalPayment';
 import Total from './Total';
+import Swal from 'sweetalert2'
+
 
 const FormSchema = Yup.object().shape({
   name: Yup.string()
@@ -30,7 +32,7 @@ const FormSchema = Yup.object().shape({
 });
 
 const Payment = ({ shipping, payment, subtotal }) => {
-  useDocumentTitle('Check Out Final Step | Salinaka');
+  useDocumentTitle('Check Out Final Step | Ayounek');
   useScrollTop();
 
   const initFormikValues = {
@@ -41,8 +43,21 @@ const Payment = ({ shipping, payment, subtotal }) => {
     type: payment.type || 'paypal'
   };
 
+
   const onConfirm = () => {
-    displayActionMessage('Feature not ready yet :)', 'info');
+    console.info("aaaaaaaaaaaaaaaaaaaa")
+    // Show success popup
+    Swal .fire({
+      title: <p>Payment Successful!</p>,
+      html: <p>Votre achat a été effectué avec succès. Merci de faire confiance à Ayounek !</p>,
+      icon: 'success',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      willClose: () => {
+        history.push('/'); 
+      }
+    });
   };
 
   if (!shipping || !shipping.isDone) {
@@ -55,23 +70,20 @@ const Payment = ({ shipping, payment, subtotal }) => {
         initialValues={initFormikValues}
         validateOnChange
         validationSchema={FormSchema}
-        validate={(form) => {
-          if (form.type === 'paypal') {
-            displayActionMessage('Feature not ready yet :)', 'info');
-          }
-        }}
         onSubmit={onConfirm}
       >
-        {() => (
+        {({ values }) => (
           <Form className="checkout-step-3">
             <CreditPayment />
             <PayPalPayment />
             <Total
               isInternational={shipping.isInternational}
               subtotal={subtotal}
+              type={values.type}
             />
           </Form>
         )}
+
       </Formik>
     </div>
   );

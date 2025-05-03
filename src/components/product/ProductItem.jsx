@@ -43,7 +43,7 @@ const ProductItem = ({ product, isItemOnBasket, addToBasket }) => {
               <ImageLoader
                 alt={product.name}
                 className="product-card-img"
-                src={product.image}
+                src={product.image?? ''}
               />
             ) : <Skeleton width="100%" height="90%" />}
           </div>

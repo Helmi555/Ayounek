@@ -43,7 +43,9 @@ function* productSaga({ type, payload }) {
       try {
         yield initRequest();
         const state = yield select();
-        const result = yield call(firebase.getProducts, payload);
+        // Pass filters from state.filter to firebase.getProducts
+        const filters = state.filter || {};
+        const result = yield call(firebase.getProducts, payload, filters);
 
         if (result.products.length === 0) {
           handleError('No items found.');

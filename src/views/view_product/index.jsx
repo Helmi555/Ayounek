@@ -16,9 +16,9 @@ import Select from 'react-select';
 
 
 const categoryOptions = [
-  { value: 1, label: 'Rounded',description:"Circular or oval frames" },
-  { value: 2, label: 'Square',description:"Frames with equal width and height, featuring sharp angles." },
-  { value: 3, label: 'Rectangle',description:"Wider than they are tall, with straight lines and angles." }
+  { value: 1, label: 'Rounded', description: "Circular or oval frames" },
+  { value: 2, label: 'Square', description: "Frames with equal width and height, featuring sharp angles." },
+  { value: 3, label: 'Rectangle', description: "Wider than they are tall, with straight lines and angles." }
 ];
 
 
@@ -86,14 +86,19 @@ const ViewProduct = () => {
                 {product.imageCollection.map((image) => (
                   <div
                     className="product-modal-image-collection-wrapper"
-                    key={image.id}
+                    key={product.id}
                     onClick={() => setSelectedImage(image.url)}
                     role="presentation"
                   >
-                    <ImageLoader
-                      className="product-modal-image-collection-img"
-                      src={image.url}
-                    />
+                    {selectedImage ? (
+                      <ImageLoader
+                        alt={product.name}
+                        className="product-modal-image"
+                        src={selectedImage}
+                      />
+                    ) : (
+                      <div className="product-modal-image-placeholder">Loading image...</div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -110,8 +115,8 @@ const ViewProduct = () => {
               <br />
               <span className="text-subtle">{product.brand}</span>
               <div className='d-flex-between-center'>
-              <h1 className="margin-top-0">{product.name}</h1>
-              <h3 className='margin-top-0 '>{categoryOptions.find(opt=>opt.value===product.category)?.label }</h3>
+                <h1 className="margin-top-0">{product.name}</h1>
+                <h3 className='margin-top-0 '>{categoryOptions.find(opt => opt.value === product.category)?.label}</h3>
               </div>
               <span>{product.description}</span>
               <br />

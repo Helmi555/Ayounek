@@ -10,14 +10,15 @@ class Handle extends Component {
     };
   }
 
-
-  onMouseEnter() {
+  // ✅ Use arrow function to auto-bind `this`
+  onMouseEnter = () => {
     this.setState({ mouseOver: true });
-  }
+  };
 
-  onMouseLeave() {
+  // ✅ Use arrow function to auto-bind `this`
+  onMouseLeave = () => {
     this.setState({ mouseOver: false });
-  }
+  };
 
   render() {
     const {
@@ -58,10 +59,9 @@ class Handle extends Component {
             width: 26,
             height: 42,
             cursor: 'pointer',
-            // border: '1px solid grey',
             backgroundColor: 'none'
           }}
-          // eslint-disable-next-line react/jsx-props-no-spreading
+          // Pass events via spread and bound methods
           {...getHandleProps(id, {
             onMouseEnter: this.onMouseEnter,
             onMouseLeave: this.onMouseLeave
@@ -93,7 +93,6 @@ class Handle extends Component {
 }
 
 Handle.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   domain: PropType.array.isRequired,
   handle: PropType.shape({
     id: PropType.string.isRequired,

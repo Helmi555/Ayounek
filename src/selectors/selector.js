@@ -1,6 +1,16 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-else-return */
+
+const categoryOptions = [
+  { value: 0, label: 'All Categories',description:"All available categories" },
+  { value: 1, label: 'Rounded',description:"Circular or oval frames" },
+  { value: 2, label: 'Square',description:"Frames with equal width and height, featuring sharp angles." },
+  { value: 3, label: 'Rectangle',description:"Wider than they are tall, with straight lines and angles." }
+];
+
+
 export const selectFilter = (products, filter) => {
+  console.info("In teh selector  : ",products,filter)
   if (!products || products.length === 0) return [];
 
   const keyword = filter.keyword.toLowerCase();
@@ -15,8 +25,9 @@ export const selectFilter = (products, filter) => {
       ? product.description.toLowerCase().includes(keyword)
       : true;
     const matchBrand = product.brand ? product.brand.toLowerCase().includes(filter.brand) : true;
+    const matchCategory = filter.category!==0 ? product.category===filter.category : true;
 
-    return ((matchKeyword || matchDescription) && matchBrand && isInRange);
+    return ((matchKeyword || matchDescription ) && matchCategory && matchBrand && isInRange);
   }).sort((a, b) => {
     if (filter.sortBy === 'name-desc') {
       return a.name < b.name ? 1 : -1;
