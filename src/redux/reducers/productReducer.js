@@ -23,7 +23,7 @@ export default (state = {
         ...state,
         lastRefKey: action.payload.lastKey,
         total: action.payload.total,
-        items: [...state.items, ...action.payload.products]
+        items: action.payload.products  
       };
     case ADD_PRODUCT_SUCCESS:
       return {
@@ -36,7 +36,7 @@ export default (state = {
         searchedProducts: {
           lastRefKey: action.payload.lastKey,
           total: action.payload.total,
-          items: [...state.searchedProducts.items, ...action.payload.products]
+          items:  action.payload.products 
         }
       };
     case CLEAR_SEARCH_STATE:

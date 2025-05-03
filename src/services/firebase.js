@@ -1,14 +1,12 @@
 import app from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import "firebase/storage";
 import firebaseConfig from "./config";
 
 class Firebase {
   constructor() {
     app.initializeApp(firebaseConfig);
 
-    this.storage = app.storage();
     this.db = app.firestore();
     this.auth = app.auth();
   }
@@ -249,14 +247,6 @@ class Firebase {
 
   generateKey = () => this.db.collection("products").doc().id;
 
-  storeImage = async (id, folder, imageFile) => {
-    const snapshot = await this.storage.ref(folder).child(id).put(imageFile);
-    const downloadURL = await snapshot.ref.getDownloadURL();
-
-    return downloadURL;
-  };
-
-  deleteImage = (id) => this.storage.ref("products").child(id).delete();
 
   editProduct = (id, updates) =>
     this.db.collection("products").doc(id).update(updates);

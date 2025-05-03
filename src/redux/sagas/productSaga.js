@@ -66,93 +66,53 @@ function* productSaga({ type, payload }) {
     case ADD_PRODUCT: {
       try {
         yield initRequest();
-
-        const { imageCollection } = payload;
+    
+        // 1) generate your new doc ID
         const key = yield call(firebase.generateKey);
-        const downloadURL = yield call(firebase.storeImage, key, 'products', payload.image);
-        const image = { id: key, url: downloadURL };
-        let images = [];
-
-        if (imageCollection.length !== 0) {
-          const imageKeys = yield all(imageCollection.map(() => firebase.generateKey));
-          const imageUrls = yield all(imageCollection.map((img, i) => firebase.storeImage(imageKeys[i](), 'products', img.file)));
-          images = imageUrls.map((url, i) => ({
-            id: imageKeys[i](),
-            url
-          }));
-        }
-
-        const product = {
+    
+        // 2) since payload.image is already a URL, skip storeImage entirely
+        const downloadURL = payload.image;
+    
+        // 3) build the object you’ll save
+        const productData = {
           ...payload,
           image: downloadURL,
-          imageCollection: [image, ...images]
+          imageCollection: Array.isArray(payload.imageCollection)
+          ? payload.imageCollection.map(item =>
+              typeof item === 'string' ? item : item.url || ''
+            ).filter(Boolean)
+          : [downloadURL]
         };
-
-        yield call(firebase.addProduct, key, product);
-        yield put(addProductSuccess({
-          id: key,
-          ...product
-        }));
-        yield handleAction(ADMIN_PRODUCTS, 'Item succesfully added', 'success');
+    
+        // 4) write to Firestore
+        yield call(firebase.addProduct, key, productData);
+    
+        yield put(addProductSuccess({ id: key, ...productData }));
+        yield handleAction(ADMIN_PRODUCTS, 'Item successfully added', 'success');
         yield put(setLoading(false));
       } catch (e) {
         yield handleError(e);
-        yield handleAction(undefined, `Item failed to add: ${e?.message}`, 'error');
+        yield handleAction(undefined, `Item failed to add: ${e.message}`, 'error');
       }
       break;
     }
+    
     case EDIT_PRODUCT: {
       try {
         yield initRequest();
-
-        const { image, imageCollection } = payload.updates;
-        let newUpdates = { ...payload.updates };
-
-        if (image.constructor === File && typeof image === 'object') {
-          try {
-            yield call(firebase.deleteImage, payload.id);
-          } catch (e) {
-            console.error('Failed to delete image ', e);
-          }
-
-          const url = yield call(firebase.storeImage, payload.id, 'products', image);
-          newUpdates = { ...newUpdates, image: url };
-        }
-
-        if (imageCollection.length > 1) {
-          const existingUploads = [];
-          const newUploads = [];
-
-          imageCollection.forEach((img) => {
-            if (img.file) {
-              newUploads.push(img);
-            } else {
-              existingUploads.push(img);
-            }
-          });
-
-          const imageKeys = yield all(newUploads.map(() => firebase.generateKey));
-          const imageUrls = yield all(newUploads.map((img, i) => firebase.storeImage(imageKeys[i](), 'products', img.file)));
-          const images = imageUrls.map((url, i) => ({
-            id: imageKeys[i](),
-            url
-          }));
-          newUpdates = { ...newUpdates, imageCollection: [...existingUploads, ...images] };
-        } else {
-          newUpdates = {
-            ...newUpdates,
-            imageCollection: [{ id: new Date().getTime(), url: newUpdates.image }]
-          };
-          // add image thumbnail to image collection from newUpdates to
-          // make sure you're adding the url not the file object.
-        }
-
+    
+        // grab the URL from the form
+        const { image, ...rest } = payload.updates;
+        const newUpdates = { ...rest, image };
+    
+        // if you want to keep a single‑item collection
+        newUpdates.imageCollection = [{ id: payload.id, url: image }];
+    
+        // apply the update
         yield call(firebase.editProduct, payload.id, newUpdates);
-        yield put(editProductSuccess({
-          id: payload.id,
-          updates: newUpdates
-        }));
-        yield handleAction(ADMIN_PRODUCTS, 'Item succesfully edited', 'success');
+    
+        yield put(editProductSuccess({ id: payload.id, updates: newUpdates }));
+        yield handleAction(ADMIN_PRODUCTS, 'Item successfully edited', 'success');
         yield put(setLoading(false));
       } catch (e) {
         yield handleError(e);
