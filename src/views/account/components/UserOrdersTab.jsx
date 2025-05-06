@@ -1,12 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Just add this feature if you want :P
+import { useSelector } from 'react-redux';
+import firebaseInstance from '@/services/firebase';
 
-const UserOrdersTab = () => (
-  <div className="loader" style={{ minHeight: '80vh' }}>
-    <h3>My Orders</h3>
-    <strong><span className="text-subtle">You don&apos;t have any orders</span></strong>
-  </div>
-);
+
+const UserOrdersTab = ({email}) => {
+
+
+  const [orders, setOrders] = useState([])
+
+  useEffect(() => {
+
+    console.info("email is : ", email)
+
+    const fetchOrders = async () => {
+
+      try {
+        const orders = await firebaseInstance.getOrders(email);
+        setOrders(orders.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        console.info("Orders are : ", orders);
+      } catch (error) {
+        console.error("Error fetching orders: ", error);
+      }
+    }
+    fetchOrders();
+
+  }, [])
+
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="loader" style={{ minHeight: '80vh' }}>
+        <h3>My Orders</h3>
+        <strong><span className="text-subtle">You don&apos;t have any orders</span></strong>
+      </div>
+    )
+  }
+
+
+  return (
+    <div style={{ maxWidth: '800px', margin: 'auto', padding: '20px', background: 'white', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}>
+      <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>My Orders</h2>
+      
+      {orders.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {orders.map((order) => (
+            <div key={order.id} style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '6px', background: '#f9f9f9', transition: 'background 0.3s' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>Order ID: {order.id}</h3>
+                <span style={{
+                  padding: '6px 10px',
+                  borderRadius: '4px',
+                  fontWeight: 'bold',
+                  background: order.status === 'Completed' ? '#c8e6c9' : order.status === 'Pending' ? '#fff3cd' : '#f8d7da',
+                  color: order.status === 'Completed' ? '#2e7d32' : order.status === 'Pending' ? '#856404' : '#721c24'
+                }}>
+                  {order.status}
+                </span>
+              </div>
+
+              <p style={{ fontSize: '14px', color: '#555', marginTop: '6px' }}>📅 Date: {order.date}</p>
+              <p style={{ fontSize: '14px', fontWeight: 'medium', color: '#333', marginTop: '6px' }}>💰 Total: {order.total} TND</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p style={{ textAlign: 'center', fontSize: '16px', color: '#777' }}>No orders found. Start shopping now! 🛍️</p>
+      )}
+    </div>
+
+  )
+}
 
 export default UserOrdersTab;

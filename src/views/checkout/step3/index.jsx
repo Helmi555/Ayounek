@@ -35,6 +35,9 @@ const Payment = ({ shipping, payment, subtotal }) => {
   useDocumentTitle('Check Out Final Step | Ayounek');
   useScrollTop();
 
+
+
+  
   const initFormikValues = {
     name: payment.name || '',
     cardnumber: payment.cardnumber || '',
