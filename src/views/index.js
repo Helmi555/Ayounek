@@ -15,6 +15,7 @@ export { default as PageNotFound } from './error/PageNotFound';
 export { default as FeaturedProducts } from './featured';
 export { default as Home } from './home';
 export { default as RecommendedProducts } from './recommended';
+export { default as NewFeature } from './NewFeatures';
 export { default as Search } from './search';
 export { default as Shop } from './shop';
 export { default as ViewProduct } from './view_product';
