@@ -42,7 +42,6 @@ const Total = ({ isInternational, subtotal, type }) => {
     console.info("HIIIIIIIIIII : ", values, type);
         submitForm();
         try{
-
           const result= firebaseInstance.createOrder({
             basket: state.basket,
             shipping: state.shipping,
@@ -51,7 +50,7 @@ const Total = ({ isInternational, subtotal, type }) => {
             email:state.shipping.email,
             date: new Date().toISOString(),
             status: 'pending'
-            
+
         })
 
           Swal.fire({
@@ -78,9 +77,7 @@ const Total = ({ isInternational, subtotal, type }) => {
               timer: 5000,
               timerProgressBar: true
          
-          });
-
-        }
+          })}
    
 
   };

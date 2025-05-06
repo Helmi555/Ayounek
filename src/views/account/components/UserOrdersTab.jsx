@@ -46,13 +46,13 @@ const UserOrdersTab = ({email}) => {
           {orders.map((order) => (
             <div key={order.id} style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '6px', background: '#f9f9f9', transition: 'background 0.3s' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>Order ID: {order.id}</h3>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold' }}>Order ID: {order.id.slice(0,6)}***</h3>
                 <span style={{
                   padding: '6px 10px',
                   borderRadius: '4px',
                   fontWeight: 'bold',
-                  background: order.status === 'Completed' ? '#c8e6c9' : order.status === 'Pending' ? '#fff3cd' : '#f8d7da',
-                  color: order.status === 'Completed' ? '#2e7d32' : order.status === 'Pending' ? '#856404' : '#721c24'
+                  background: order.status === 'Completed' ? '#c8e6c9' : order.status === 'Pending' ? '#fff3cd' : '#cce5ff',
+                  color: order.status === 'Completed' ? '#2e7d32' : order.status === 'Pending' ? '#856404' : '#004085',
                 }}>
                   {order.status}
                 </span>
