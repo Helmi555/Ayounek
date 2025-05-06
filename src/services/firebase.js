@@ -100,6 +100,12 @@ class Firebase {
 
   // // PRODUCT ACTIONS --------------
 
+  createOrder= (command) =>
+    this.db.collection("commands").add(command);
+
+  getOrders=(email) =>
+    this.db.collection("commands").where("email", "==", email).get();
+
   getSingleProduct = (id) => this.db.collection("products").doc(id).get();
 
   getProducts = (lastRefKey, filters = {}) => {

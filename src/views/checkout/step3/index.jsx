@@ -12,6 +12,12 @@ import CreditPayment from './CreditPayment';
 import PayPalPayment from './PayPalPayment';
 import Total from './Total';
 import Swal from 'sweetalert2'
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import { resetCheckout } from '@/redux/actions/checkoutActions';
+import { clearBasket } from '@/redux/actions/basketActions';
+import firebaseInstance from '@/services/firebase';
+
 
 
 const FormSchema = Yup.object().shape({
@@ -35,6 +41,12 @@ const Payment = ({ shipping, payment, subtotal }) => {
   useDocumentTitle('Check Out Final Step | Ayounek');
   useScrollTop();
 
+
+
+  const history = useHistory();
+  const dispatch = useDispatch();
+
+
   const initFormikValues = {
     name: payment.name || '',
     cardnumber: payment.cardnumber || '',
@@ -46,18 +58,44 @@ const Payment = ({ shipping, payment, subtotal }) => {
 
   const onConfirm = () => {
     console.info("aaaaaaaaaaaaaaaaaaaa")
-    // Show success popup
-    Swal .fire({
-      title: <p>Payment Successful!</p>,
-      html: <p>Votre achat a été effectué avec succès. Merci de faire confiance à Ayounek !</p>,
-      icon: 'success',
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      willClose: () => {
-        history.push('/'); 
-      }
-    });
+
+  try{
+          const result= firebaseInstance.createOrder({
+            basket: state.basket,
+            shipping: state.shipping,
+            payment:state.payment,
+            total:subtotal + (isInternational ? 50 : 0),
+            email:state.shipping.email,
+            date: new Date().toISOString(),
+            status: 'pending'
+
+        })
+
+          Swal.fire({
+            title: 'Payment Successful!',
+            text: 'Your purchase has been successfully completed. Thank you for trusting Ayounek!',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+            willClose: () => {
+              dispatch(resetCheckout())
+              dispatch(clearBasket())
+              history.push('/');
+            }
+          });
+        }catch(e){
+          console.error("Error while creating order : ", e)
+          Swal.fire({
+              title: 'Order Failed!',
+              text: `Oops! Something went wrong while processing your order. ${e.message}`,
+              icon: 'error',
+              showConfirmButton: true,
+              confirmButtonText: 'Retry',
+              timer: 5000,
+              timerProgressBar: true
+         
+          })}
   };
 
   if (!shipping || !shipping.isDone) {
