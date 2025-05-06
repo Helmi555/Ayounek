@@ -58,6 +58,7 @@
     "firebase": "^8.4.3",
     "formik": "^2.2.6",
     "history": "^4.10.0",
+    "install": "^0.13.0",
     "moment": "^2.29.1",
     "normalize.css": "^8.0.1",
     "prop-types": "^15.7.2",

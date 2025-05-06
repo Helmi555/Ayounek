@@ -131,7 +131,7 @@ ProductItem.propTypes = {
     maxQuantity: PropType.number,
     description: PropType.string,
     keywords: PropType.arrayOf(PropType.string),
-    imageCollection: PropType.arrayOf(PropType.object),
+    imageCollection: PropType.arrayOf(PropType.string),
     sizes: PropType.arrayOf(PropType.string),
     image: PropType.string,
     imageUrl: PropType.string,

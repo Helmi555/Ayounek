@@ -88,18 +88,27 @@ class Firebase {
         return 0; // Return 0 if there's an error
       }
     }
-  getUsers =async (lastRefKey, filters) => {
-    let query = db.collection('users');
 
-    if (lastRefKey) query = query.startAfter(lastRefKey);
+    getUsers = async () => {
+      const snapshot = await this.db.collection('users').get();
+      const users = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      return {
+        items: users,
+        total: snapshot.size,
+      };
+    };
+  // getUsers =async (lastRefKey, filters) => {
+  //   let query = db.collection('users');
 
-    const snapshot = await query.limit(12).get();
-    return {
-      users: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
-      lastKey: snapshot.docs[snapshot.docs.length - 1],
-      total: await this.countDocuments('users')
-  }
-  }
+  //   if (lastRefKey) query = query.startAfter(lastRefKey);
+
+  //   const snapshot = await query.limit(12).get();
+  //   return {
+  //     users: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+  //     lastKey: snapshot.docs[snapshot.docs.length - 1],
+  //     total: await this.countDocuments('users')
+  // }
+  // }
   updateProfile = (id, updates) =>
     this.db.collection("users").doc(id).update(updates);
 

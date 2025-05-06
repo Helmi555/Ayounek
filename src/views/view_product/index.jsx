@@ -42,6 +42,7 @@ const ViewProduct = () => {
   const colorOverlay = useRef(null);
 
   useEffect(() => {
+    console.info("In the product view : ",product.imageCollection);
     setSelectedImage(product?.image);
   }, [product]);
 

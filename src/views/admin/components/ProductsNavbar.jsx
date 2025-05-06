@@ -17,7 +17,7 @@ const ProductsNavbar = (props) => {
         {`${productsCount} / ${totalProductsCount}`}
         )
       </h3>
-      <SearchBar />
+      <SearchBar name="products"/>
             &nbsp;
       <FiltersToggle>
         <button className="button-muted button-small" type="button">

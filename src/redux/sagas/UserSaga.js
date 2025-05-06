@@ -1,5 +1,6 @@
 import { call, put, select } from 'redux-saga/effects';
 import { GET_USERS } from '@/constants/constants';
+import { ADMIN_USERS } from '@/constants/routes';
 import { getUsersSuccess } from '@/redux/actions/userActions';
 import firebase from '@/services/firebase';
 

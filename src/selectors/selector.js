@@ -10,7 +10,6 @@ const categoryOptions = [
 
 
 export const selectFilter = (products, filter) => {
-  console.info("In teh selector  : ",products,filter)
   if (!products || products.length === 0) return [];
 
   const keyword = filter.keyword.toLowerCase();

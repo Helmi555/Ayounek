@@ -1,11 +1,13 @@
 /* eslint-disable react/no-array-index-key */
 import { SearchOutlined } from '@ant-design/icons';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState,useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { clearRecentSearch, removeSelectedRecent } from '@/redux/actions/filterActions';
+import PropType from 'prop-types';
 
-const SearchBar = () => {
+
+const SearchBar = ({name}) => {
   const [searchInput, setSearchInput] = useState('');
   const { filter, isLoading } = useSelector((state) => ({
     filter: state.filter,
@@ -21,6 +23,10 @@ const SearchBar = () => {
     const val = e.target.value.trimStart();
     setSearchInput(val);
   };
+
+  useEffect(() => {
+    console.log(name);
+  },[])
 
   const onKeyUp = (e) => {
     if (e.keyCode === 13) {
@@ -73,7 +79,7 @@ const SearchBar = () => {
           onChange={onSearchChange}
           onKeyUp={onKeyUp}
           onFocus={onFocusInput}
-          placeholder="Search product..."
+          placeholder={`Search ${name || ""} ...` }
           readOnly={isLoading}
           type="text"
           value={searchInput}
@@ -117,5 +123,9 @@ const SearchBar = () => {
     </>
   );
 };
+
+SearchBar.propTypes={
+    name: PropType.string.isRequired,
+}
 
 export default SearchBar;
