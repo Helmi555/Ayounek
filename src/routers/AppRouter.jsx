@@ -9,8 +9,7 @@ import AdminRoute from './AdminRoute';
 import ClientRoute from './ClientRoute';
 import PublicRoute from './PublicRoute';
 
-// Revert back to history v4.10.0 because
-// v5.0 breaks navigation
+
 export const history = createBrowserHistory();
 
 const AppRouter = () => (

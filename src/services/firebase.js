@@ -78,6 +78,28 @@ class Firebase {
         .catch((error) => reject(error));
     });
 
+
+    countDocuments = async (collectionName) => {
+      try {
+        const snapshot = await this.db.collection(collectionName).get();
+        return snapshot.size;
+      } catch (error) {
+        console.error(`Error counting documents in ${collectionName}:`, error);
+        return 0; // Return 0 if there's an error
+      }
+    }
+  getUsers =async (lastRefKey, filters) => {
+    let query = db.collection('users');
+
+    if (lastRefKey) query = query.startAfter(lastRefKey);
+
+    const snapshot = await query.limit(12).get();
+    return {
+      users: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+      lastKey: snapshot.docs[snapshot.docs.length - 1],
+      total: await this.countDocuments('users')
+  }
+  }
   updateProfile = (id, updates) =>
     this.db.collection("users").doc(id).update(updates);
 
@@ -100,10 +122,10 @@ class Firebase {
 
   // // PRODUCT ACTIONS --------------
 
-  createOrder= (command) =>
+  createOrder = (command) =>
     this.db.collection("commands").add(command);
 
-  getOrders=(email) =>
+  getOrders = (email) =>
     this.db.collection("commands").where("email", "==", email).get();
 
   getSingleProduct = (id) => this.db.collection("products").doc(id).get();

@@ -23,7 +23,7 @@ export default (state = {
         ...state,
         lastRefKey: action.payload.lastKey,
         total: action.payload.total,
-        items: action.payload.products  
+        items: [...state.items,...action.payload.products]  
       };
     case ADD_PRODUCT_SUCCESS:
       return {

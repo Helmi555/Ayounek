@@ -1,4 +1,4 @@
-import { ADD_USER, DELETE_USER, EDIT_USER } from '@/constants/constants';
+import { ADD_USER, DELETE_USER, EDIT_USER,  GET_USERS_SUCCESS  } from '@/constants/constants';
 
 // const initState = [
 //   {
@@ -11,9 +11,21 @@ import { ADD_USER, DELETE_USER, EDIT_USER } from '@/constants/constants';
 //     dateJoined: 0
 //   }
 // ];
+const initialState = {
+  items: [],       // Array of users (replaces your old array state)
+  lastRefKey: null, // For pagination
+  total: 0         // Total users count
+};
 
 export default (state = {}, action) => {
   switch (action.type) {
+    case GET_USERS_SUCCESS:
+      return {
+        ...state,
+        items: [...state.items, ...action.payload.users],
+        lastRefKey: action.payload.lastKey,
+        total: action.payload.total
+      }
     case ADD_USER:
       return [...state, action.payload];
     case EDIT_USER:
@@ -30,5 +42,7 @@ export default (state = {}, action) => {
       return state.filter((user) => user.id !== action.payload);
     default:
       return state;
-  }
+  
+
+    }
 };
