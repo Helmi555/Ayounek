@@ -98,12 +98,12 @@ class Firebase {
   setAuthPersistence = () =>
     this.auth.setPersistence(app.auth.Auth.Persistence.LOCAL);
 
-  // // PRODUCT ACTIONS --------------
+  // PRODUCT ACTIONS --------------
 
-  createOrder= (command) =>
+  createOrder = (command) =>
     this.db.collection("commands").add(command);
 
-  getOrders=(email) =>
+  getOrders = (email) =>
     this.db.collection("commands").where("email", "==", email).get();
 
   getSingleProduct = (id) => this.db.collection("products").doc(id).get();
@@ -116,12 +116,10 @@ class Firebase {
         try {
           let query = this.db.collection("products");
 
-          // Apply category filter if provided and not 0 (which means all categories)
           if (filters.category && filters.category !== 0) {
             query = query.where("category", "==", filters.category);
           }
 
-          // Add ordering and pagination
           query = query.orderBy(app.firestore.FieldPath.documentId());
 
           if (lastRefKey) {
@@ -155,7 +153,6 @@ class Firebase {
     });
   };
 
-
   searchProducts = (searchKey) => {
     let didTimeout = false;
 
@@ -179,10 +176,8 @@ class Firebase {
             .where("keywords", "array-contains-any", searchKey.split(" "))
             .limit(12);
 
-          // const totalResult = await totalQueryRef.get();
           const nameSnaps = await searchedNameRef.get();
           const keywordsSnaps = await searchedKeywordsRef.get();
-          // const total = totalResult.docs.length;
 
           clearTimeout(timeout);
           if (!didTimeout) {
@@ -203,7 +198,6 @@ class Firebase {
               });
             }
 
-            // MERGE PRODUCTS
             const mergedProducts = [
               ...searchedNameProducts,
               ...searchedKeywordsProducts,
@@ -242,13 +236,177 @@ class Firebase {
 
   generateKey = () => this.db.collection("products").doc().id;
 
-
   editProduct = (id, updates) =>
     this.db.collection("products").doc(id).update(updates);
 
   removeProduct = (id) => this.db.collection("products").doc(id).delete();
+
+  // CHART DATA METHODS --------------------
+  getTotalRevenue = async () => {
+    const snapshot = await this.db.collection("commands").get();
+    return snapshot.docs.reduce((total, doc) => {
+      const data = doc.data();
+      return total + (data.total || 0);
+    }, 0);
+  };
+  
+  getTotalOrders = async () => {
+    const snapshot = await this.db.collection("commands").get();
+    return snapshot.size;
+  };
+  
+  getAverageOrderValue = async () => {
+    const revenue = await this.getTotalRevenue();
+    const orders = await this.getTotalOrders();
+    return orders > 0 ? revenue / orders : 0;
+  };
+
+  getMostSoldProducts = async (limit = 5) => {
+    try {
+      const snapshot = await this.db.collection("commands").get();
+      const productCount = {};
+      const productData = {};
+  
+      
+      const promises = [];
+      snapshot.forEach(doc => {
+        const order = doc.data();
+        if (order.basket?.length) {
+          order.basket.forEach(item => {
+            if (item.id) {
+              productCount[item.id] = (productCount[item.id] || 0) + (item.quantity || 1);
+              if (!productData[item.id]) {
+                promises.push(
+                  this.getSingleProduct(item.id)
+                  .then(productDoc => {
+                    if (productDoc.exists) {
+                      productData[item.id] = productDoc.data();
+                    }
+                  })
+                );
+              }
+            }
+          });
+        }
+      });
+  
+      await Promise.all(promises);
+      
+      
+      return Object.keys(productCount)
+        .map(id => ({
+          id,
+          name: productData[id]?.name || 'Unknown Product',
+          unitsSold: productCount[id],
+          revenue: productCount[id] * (productData[id]?.price || 0)
+        }))
+        .sort((a, b) => b.unitsSold - a.unitsSold)
+        .slice(0, limit);
+    } catch (error) {
+      console.error("Error fetching most sold products:", error);
+      return [];
+    }
+  };
+  
+  
+  getMostSoldColors = async (limit = 5) => {
+    try {
+      const snapshot = await this.db.collection("commands").get();
+      const colorCount = {};
+      const productPromises = [];
+  
+     
+      snapshot.forEach(doc => {
+        const order = doc.data();
+        if (order.basket?.length) {
+          order.basket.forEach(item => {
+            if (item.id) {
+              productPromises.push(this.getSingleProduct(item.id));
+            }
+          });
+        }
+      });
+  
+      
+      const productSnapshots = await Promise.all(productPromises);
+      
+      
+      productSnapshots.forEach(productDoc => {
+        if (productDoc.exists) {
+          const product = productDoc.data();
+          const colors = product.availableColors || [];
+          colors.forEach(color => {
+            colorCount[color] = (colorCount[color] || 0) + 1;
+          });
+        }
+      });
+  
+      return Object.entries(colorCount)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, limit);
+    } catch (error) {
+      console.error("Error fetching most sold colors:", error);
+      return [];
+    }
+  };
+  
+  
+  getMonthlyRevenue = async (year = new Date().getFullYear()) => {
+    try {
+      const snapshot = await this.db.collection("commands").get();
+      const monthlyRevenue = Array(12).fill(0);
+  
+      snapshot.forEach(doc => {
+        const order = doc.data();
+        let orderDate;
+        
+       
+        if (order.date?.toDate) {
+          orderDate = order.date.toDate();
+        } else if (order.date) {
+          orderDate = new Date(order.date);
+        } else {
+          return;
+        }
+  
+        if (orderDate.getFullYear() === year) {
+          const month = orderDate.getMonth();
+          monthlyRevenue[month] += order.total || 0;
+        }
+      });
+  
+      const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      ];
+  
+      return {
+        labels: monthNames,
+        series: [{
+          name: 'Revenue',
+          data: monthlyRevenue
+        }]
+      };
+    } catch (error) {
+      console.error("Error fetching monthly revenue:", error);
+      return {
+        labels: [],
+        series: [{ data: [] }]
+      };
+    }
+  };
+  
+  
+  getUserCount = async () => {
+    try {
+      const snapshot = await this.db.collection("users").get();
+      return snapshot.size;
+    } catch (error) {
+      console.error("Error fetching user count:", error);
+      return 0;
+    }
+  };
 }
-
-const firebaseInstance = new Firebase();
-
+const firebaseInstance=new Firebase()
 export default firebaseInstance;
