@@ -133,7 +133,7 @@ class Firebase {
           const lastKey = snapshot.docs[snapshot.docs.length - 1];
 
           // Get total count for filtered products
-          const totalQuery = await this.db.collection("products");
+          let totalQuery = await this.db.collection("products");
           if (filters.category && filters.category !== 0) {
             totalQuery = totalQuery.where("category", "==", filters.category);
           }
