@@ -146,12 +146,24 @@
 }
 
 .result-box {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background-color: #f0fdf4;
-  border: 1px solid #10b981;
-  border-radius: 8px;
-  color: #065f46;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  color: #334155;
+  transition: all 0.3s ease;
+}
+
+.result-box:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-color: #cbd5e1;
+}
+
+.result-box strong {
+  color: #1e293b;
+  font-weight: 600;
 }
 @keyframes pulse {
   20% { transform: scale(1); opacity: 1; }

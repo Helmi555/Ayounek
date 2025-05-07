@@ -80,7 +80,7 @@ const NewFeature = () => {
               NEW AI
             </span>
               Feature</h1>
-            <p>Upload an image and see the AI-powered prediction!</p>
+            <p>Upload a photo of yourself to unlock your perfect eyewear match! Our AI will analyze your facial features in seconds to recommend frames that complement your unique face shape, skin tone, and personal style—like having a virtual stylist at your fingertips</p>
           </div>
           <div className="banner-img">
             <img src={bannerImg} alt="Banner" />
@@ -143,8 +143,35 @@ const NewFeature = () => {
 
             {resultText && (
               <div className="result-box">
-                <p><strong>The Best Category that goes with you is: </strong> {resultText} </p>
-                <p> <strong>Those Are some Suggestions</strong></p>
+                <p style={{ marginBottom: '0.75rem', fontSize: '1.6rem' }}>
+                  Your optimal frame category:
+                </p>
+                <div style={{
+                  display: 'inline-block',
+                  marginBottom: '1.25rem',
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#f0fdf4',
+                  borderRadius: '0.375rem',
+                  borderLeft: '4px solid #10b981'
+                }}>
+                  <span style={{
+                    fontSize: '1.8rem',
+                    color: '#065f46',
+                    fontWeight: '600',
+                    letterSpacing: '0.025em'
+                  }}>
+                    {resultText}
+                  </span>
+                </div>
+                <p style={{
+                  marginTop: '1rem',
+                  paddingTop: '1rem',
+                  borderTop: '1px dashed #e2e8f0',
+                  color: '#64748b',
+                  fontSize: '2rem'
+                }}>
+                  Based on our analysis, we recommend these styles:
+                </p>
               </div>
             )}
           </div>
