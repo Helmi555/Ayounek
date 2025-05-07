@@ -55,6 +55,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
     "apexcharts": "^4.7.0",
+    "axios": "^0.21.4",
     "firebase": "^8.4.3",
     "formik": "^2.2.6",
     "history": "^4.10.0",
@@ -79,7 +80,6 @@
     "sweetalert2": "^11.20.0",
     "uuid": "^8.3.2",
     "webfontloader": "^1.6.28",
-    "yup": "^0.32.9",
-    "axios": "^0.21.1"
+    "yup": "^0.32.9"
   }
 }

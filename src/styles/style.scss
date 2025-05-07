@@ -153,3 +153,8 @@
   border-radius: 8px;
   color: #065f46;
 }
+@keyframes pulse {
+  20% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}

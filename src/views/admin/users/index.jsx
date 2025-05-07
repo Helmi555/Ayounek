@@ -1,32 +1,53 @@
 import { Boundary } from '@/components/common';
 import { useDocumentTitle, useScrollTop } from '@/hooks';
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import { useSelector } from 'react-redux';
 import UserNavbar from '../components/Users/UserNavbar';
+import firebaseInstance from '@/services/firebase';
+import UsersTable from '../components/Users/UsersTable';
 
 const Users = () => {
   useDocumentTitle('Product List | Ayounek Admin');
   useScrollTop();
 
-  const store = useSelector((state) => ({
-    users: state.users || { items: [], total: 0 }, // Provide default values
-  }));
+  const [users, setUsers] = React.useState([]);
+  const [count, setCount] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  const isLoading = !store.users.items; // Check if users data is still loading
+  useEffect(() => {
+
+    const fetchUsers = async () => {
+      try {
+        setIsLoading(true);
+        const usersRef = await firebaseInstance.getUsers();
+        console.info("Users are : ", usersRef);
+        const usersData = usersRef.items;
+        setUsers(usersData);
+        setCount(usersRef.total);
+        console.info("Users count: ", usersRef.total);
+      } catch (error) {
+        console.error("Error fetching users: ", error);
+      }
+      finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsers();
+
+  }, []);
 
   return (
     <Boundary>
       {isLoading ? (
-        <div>Loading users...</div> // Show a loading message while data is being fetched
+        <div>Loading users...</div> 
       ) : (
         <>
           <UserNavbar
-            usersCount={store.users.items.length || 0}
-            totalUsersCount={store.users.total || 0}
+             usersCount={count || 0}
+             totalUsersCount={count || 0}
           />
-          <div className="product-admin-items">
-            {/* Render user items here */}
-          </div>
+          <UsersTable filteredUsers={users} />
         </>
       )}
     </Boundary>
